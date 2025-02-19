@@ -1,25 +1,22 @@
 using UnityEngine;
 
-[RequireComponent(typeof(AlarmSoundPlayer))]
+[RequireComponent(typeof(AlarmAudioplayer))]
 [RequireComponent(typeof(BoxCollider))]
-public class AlarmController : MonoBehaviour
+public class AlarmChecker : MonoBehaviour
 {
-    private BoxCollider _collider;
     private int _rogueCounter = 0;
-    private AlarmSoundPlayer _player;
+    private AlarmAudioplayer _audioplayer;
 
     private void Awake()
     {
-        _collider = GetComponent<BoxCollider>();
-        _collider.isTrigger = true;
-        _player = GetComponent<AlarmSoundPlayer>();
+        _audioplayer = GetComponent<AlarmAudioplayer>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out Rogue rogue))
         {
-            _player.Activate();
+            _audioplayer.Activate();
             _rogueCounter++;
         }
     }
@@ -33,7 +30,7 @@ public class AlarmController : MonoBehaviour
 
         if (_rogueCounter == 0)
         {
-            _player.Deactivate();
+            _audioplayer.Deactivate();
         }
     }
 }

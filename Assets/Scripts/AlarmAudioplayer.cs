@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-public class AlarmSoundPlayer : MonoBehaviour
+public class AlarmAudioplayer : MonoBehaviour
 {
     [SerializeField] private AudioClip _clip;
     [SerializeField] private float _minVolume = 0f;
@@ -11,6 +11,7 @@ public class AlarmSoundPlayer : MonoBehaviour
 
     private AudioSource _audioSource;
     private float _targetVolume;
+    private Coroutine _currentCoroutine;
 
     private void Awake()
     {
@@ -21,29 +22,33 @@ public class AlarmSoundPlayer : MonoBehaviour
         _targetVolume = _minVolume;
     }
 
-    private void Update()
-    {
-
-        if (_audioSource.volume == _minVolume)
-            _audioSource.Stop();
-    }
-
     public void Activate()
     {
         _targetVolume = _maxVolume;
         _audioSource.Play();
-        StartCoroutine(ChangeSound());
+        StartSoundChange();
     }
 
     public void Deactivate()
     {
         _targetVolume = _minVolume;
-        StartCoroutine(ChangeSound());
+        StartSoundChange();
     }
+
+    private void StartSoundChange()
+    {
+        if (_currentCoroutine != null)
+        {
+            StopCoroutine(_currentCoroutine);
+        }
+
+        _currentCoroutine = StartCoroutine(ChangeSound());
+    }
+
 
     private IEnumerator ChangeSound()
     {
-        while (!Mathf.Approximately(_audioSource.volume, _targetVolume))
+        while (Mathf.Approximately(_audioSource.volume, _targetVolume) == false)
         {
             _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _targetVolume, _fadeSpeed * Time.deltaTime);
             yield return null;
@@ -53,5 +58,7 @@ public class AlarmSoundPlayer : MonoBehaviour
 
         if (_audioSource.volume == _minVolume)
             _audioSource.Stop();
+
+        _currentCoroutine = null;
     }
 }
